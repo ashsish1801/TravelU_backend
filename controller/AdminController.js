@@ -55,3 +55,45 @@ module.exports.TourismUpload = async function (req, res) {
       }
     });
   };
+  const fs = require('fs');
+  // const path = require('path');
+  
+  module.exports.deleteTour = async function (req, res) {
+    try {
+      const { title } = req.body;
+  
+      if (!title) {
+        return res.status(400).json({ message: 'Title is required to delete the tour' });
+      }
+  
+      // Find the tour by title and delete it
+      const deletedTour = await tourSchema.findOneAndDelete({ title });
+  
+      if (!deletedTour) {
+        return res.status(404).json({ message: 'Tour not found with the provided title' });
+      }
+  
+      // If an image exists, delete it from the assets folder
+      if (deletedTour.image) {
+        const imagePath = path.join(__dirname, '..', deletedTour.image);
+  
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error('Error deleting the image file:', err.message);
+            return res.status(500).json({
+              message: 'Tour deleted, but failed to delete the associated image file',
+              error: err.message,
+            });
+          }
+  
+          console.log(`Image file deleted successfully: ${imagePath}`);
+        });
+      }
+  
+      res.status(200).json({ message: 'Tour deleted successfully', deletedTour });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error', error: err.message });
+    }
+  };
+  
