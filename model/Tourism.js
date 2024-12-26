@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
 const AVATAR_PATH = path.join('/assets/TourismImages');
+console.log("AVATAR PATH" , AVATAR_PATH)
 
 // Define the schema
 const tourSchema = new mongoose.Schema({
@@ -43,7 +44,9 @@ const tourSchema = new mongoose.Schema({
 // Configure Multer storage
 let storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '..', AVATAR_PATH)); // Destination folder
+    // cb(null, path.join(__dirname, '..', AVATAR_PATH)); 
+    const destinationPath = path.join(__dirname, '..', AVATAR_PATH).replace(/\\/g, '/');
+    cb(null, destinationPath);
   },
   filename: function (req, file, cb) {
     // Extract the original file extension

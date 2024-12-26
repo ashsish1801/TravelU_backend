@@ -1,6 +1,7 @@
 const express = require('express')
 const mongooose = require('mongoose')
 const tourSchema = require('../model/Tourism')
+const path = require('path')
 
 module.exports.TourData = async function (req,res) {
   const tours = await tourSchema.find();
@@ -18,7 +19,13 @@ module.exports.TourismUpload = async function (req, res) {
   
       // Extract form fields and uploaded file information
       const { title, description, duration, price, rating, reviews } = req.body;
-      const image = req.file ? tourSchema.avatarPath + '/' + req.file.filename : null; // Construct the file path
+      // const image = req.file ? tourSchema.avatarPath + "/" + req.file.filename : null; 
+      // const image = req.file ? req.file.filename : null;
+      const image = req.file
+      ? path.join(tourSchema.avatarPath, req.file.filename).replace(/\\/g, '/')
+      : null;
+      
+      console.log(image);
   
       try {
         // Validate if the required fields are provided
